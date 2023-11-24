@@ -4,7 +4,11 @@
 @push('css')
     <link href="{{ asset('assets/datatables/datatables') }}/datatables.min.css" rel="stylesheet">
 
+
     <style>
+        #icon {
+            display: none !important;
+        }
     </style>
 @endpush
 
@@ -24,13 +28,11 @@
                                     {{-- <button type="button" class="btn btn-success" data-toggle="modal"
                                         data-target="#modal-default"> <i class="fa fa-plus pr-2"></i>Tambah
                                         User</button> --}}
-                                    <a href="{{ route('surat-masuk.create') }}" class="btn btn-success">
-                                        <i class="fa fa-plus pr-2"></i> Tambah Surat Masuk
-                                    </a>
-                                </div>
-
-                                <div>
-                                    @include('main-layouts.master-data.user-component._modal-tambah-user')
+                                    @can('tambah-surat-masuk')
+                                        <a href="{{ route('surat-masuk.create') }}" class="btn btn-success">
+                                            <i class="fa fa-plus pr-2"></i> Tambah Surat Masuk
+                                        </a>
+                                    @endcan
                                 </div>
 
                             </div>
@@ -52,32 +54,59 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody class="text-center">
-                                                    <tr>
-                                                        <td>1</td>
-                                                        <td>001</td>
-                                                        <td>Kendari</td>
-                                                        <td>
-                                                            22-07-2023
-                                                        </td>
-                                                        <td>Undangan</td>
-                                                        <td>Trisno123</td>
-                                                        <td>
-                                                            <a href="{{ route('surat-masuk.detail', 'id') }}"
-                                                                class="btn btn-info">
-                                                                <i class="fa fa-eye"></i>
-                                                            </a>
-                                                            <a href="{{ route('surat-masuk.edit', 'id') }}"
-                                                                class="btn btn-warning">
-                                                                <i class="fa fa-edit"></i>
-                                                            </a>
-                                                            <button type="button" class="btn btn-danger"
-                                                                data-toggle="modal" data-target="#modalHapus">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
-                                                        </td>
-
+                                                    @foreach ($user as $mail)
+                                                        <tr>
+                                                            <input type="hidden" class="delete_id"
+                                                                value="{{ $mail->id }}">
+                                                            <td>{{ $loop->iteration }}</td>
+                                                            <td>{{ $mail['no_agenda'] }}</td>
+                                                            <td>{{ $mail->asal_surat }}</td>
+                                                            <td>
+                                                                {{ \Carbon\Carbon::create($mail['tanggal_surat'])->format('d F Y') }}
+                                                            </td>
+                                                            <td>
+                                                                {{ $mail->klasifikasis->nama }}
+                                                            </td>
+                                                            <td>
+                                                                {{ $mail->user->name }}
+                                                            </td>
+                                                            <td>
+                                                                @can('detail-surat-masuk')
+                                                                    <a href="{{ route('surat-masuk.detail', $mail->id) }}"
+                                                                        class="btn btn-info">
+                                                                        <i class="fa fa-eye"></i>
+                                                                    </a>
+                                                                @endcan
+                                                                @can('edit-surat-masuk')
+                                                                    <a href="{{ route('surat-masuk.edit', $mail->id) }}"
+                                                                        class="btn btn-warning">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                @endcan
+                                                                @can('hapus-surat-masuk')
+                                                                    {{-- <button type="button" class="btn btn-danger"
+                                                                        data-toggle="modal"
+                                                                        data-target="#modalHapus{{ $mail->id }}">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button> --}}
+                                                                    <form
+                                                                        action="{{ route('surat-masuk.destroy', $mail->id) }}"
+                                                                        method="POST" class="d-inline-block">
+                                                                        @csrf
+                                                                        @method('delete')
+                                                                        <div class="mb-0">
+                                                                            <input name="_method" type="hidden" value="DELETE">
+                                                                            <button type="submit"
+                                                                                class="btn btn-danger btndelete">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                @endcan
+                                                            </td>
+                                                        </tr>
                                                         @include('main-layouts.persuratan.surat-masuk-component._modal-hapus-surat-masuk')
-                                                    </tr>
+                                                    @endforeach
                                                 </tbody>
                                             </table>
                                         </div>
@@ -96,9 +125,45 @@
 
 @push('js')
     <script src="{{ asset('assets/datatables/datatables') }}/datatables.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#example').DataTable();
+        });
+    </script>
+    <script>
+        $('.btndelete').click(function(event) {
+            var form = $(this).closest("form");
+            var name = $(this).data("name");
+            event.preventDefault();
+            Swal.fire({
+                    title: 'Konfirmasi Hapus Data',
+                    text: 'Anda yakin ingin menghapus data ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!'
+                })
+                .then((willDelete) => {
+                    if (willDelete.isConfirmed) {
+                        form.submit();
+                    }
+                })
+        });
+
+        $(document).ready(function() {
+            // Periksa apakah ada pesan sukses dalam session flash
+            var alert = {!! json_encode(session('status')) !!};
+
+            // Jika ada pesan sukses, tampilkan SweetAlert
+            if (alert) {
+                Swal.fire({
+                    title: alert.title,
+                    text: alert.pesan,
+                    icon: alert.icon
+                });
+            }
         });
     </script>
 @endpush

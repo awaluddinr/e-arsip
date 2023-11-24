@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>E-Arsip | {{ $title }}</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -29,6 +30,28 @@
     <link rel="stylesheet" href="{{ asset('assets/template') }}/plugins/daterangepicker/daterangepicker.css" />
     <!-- summernote -->
     <link rel="stylesheet" href="{{ asset('assets/template') }}/plugins/summernote/summernote-bs4.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+
+    <script>
+        // penting sekalinya
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+
+    <style>
+        /* @media print {
+
+            html,
+            body {
+                display: none
+            }
+        } */
+
+        body #icon {
+            display: none
+        }
+    </style>
 
     @stack('css')
 </head>
@@ -37,7 +60,8 @@
     <!-- Site wrapper -->
     <div class="wrapper">
         <!-- Navbar -->
-        <x-navbar></x-navbar>
+        <x-navbar>
+        </x-navbar>
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
@@ -124,6 +148,29 @@
     {{-- <script src="{{ asset('assets/template') }}/dist/js/demo.js"></script> --}}
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{{ asset('assets/template') }}/dist/js/pages/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $('.btnlogout').click(function(event) {
+            var form = $(this).closest("form");
+            var name = $(this).data("name");
+            event.preventDefault();
+            Swal.fire({
+                    title: 'Konfirmasi Keluar Aplikasi',
+                    text: 'Anda yakin ingin keluar dari Aplikasi?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Keluar!'
+                })
+                .then((willlogout) => {
+                    if (willlogout.isConfirmed) {
+                        form.submit();
+                    }
+                })
+        });
+    </script>
 
     @stack('js')
 </body>

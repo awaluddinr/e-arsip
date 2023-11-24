@@ -24,14 +24,16 @@
                                     {{-- <button type="button" class="btn btn-success" data-toggle="modal"
                                         data-target="#modal-default"> <i class="fa fa-plus pr-2"></i>Tambah
                                         User</button> --}}
-                                    <a href="{{ route('data-user.create') }}" class="btn btn-success">
-                                        <i class="fa fa-plus pr-2"></i> Tambah User
-                                    </a>
+                                    @can('tambah-user')
+                                        <a href="{{ route('data-user.create') }}" class="btn btn-success">
+                                            <i class="fa fa-plus pr-2"></i> Tambah User
+                                        </a>
+                                    @endcan
                                 </div>
 
-                                <div>
+                                {{-- <div>
                                     @include('main-layouts.master-data.user-component._modal-tambah-user')
-                                </div>
+                                </div> --}}
 
                             </div>
 
@@ -55,24 +57,45 @@
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
                                                             <td>{{ $dt['username'] }}</td>
-                                                            <td>{{ $dt['nama'] }}</td>
+                                                            <td>{{ $dt['name'] }}</td>
                                                             <td>
                                                                 {{ $dt['email'] }}
                                                             </td>
-                                                            <td>{{ $dt['hak-akses'] }}</td>
                                                             <td>
-                                                                <a href="{{ route('data-user.edit', $dt['id']) }}"
-                                                                    class="btn btn-warning">
-                                                                    <i class="fa fa-edit"></i>
-                                                                </a>
-                                                                <button type="button" class="btn btn-danger"
-                                                                    data-toggle="modal" data-target="#modalHapus">
-                                                                    <i class="fa fa-trash"></i>
-                                                                </button>
+                                                                @foreach ($dt['roles'] as $role)
+                                                                    {{ $role['name'] }}
+                                                                @endforeach
                                                             </td>
+                                                            <td>
+                                                                @can('edit-user')
+                                                                    <a href="{{ route('data-user.edit', $dt['id']) }}"
+                                                                        class="btn btn-warning">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                @endcan
+                                                                @can('hapus-user')
+                                                                    {{-- <button type="button" class="btn btn-danger"
+                                                                        data-toggle="modal"
+                                                                        data-target="#modalHapus{{ $dt['id'] }}">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button> --}}
 
-                                                            @include('main-layouts.master-data.user-component._modal-hapus-user')
+                                                                    <form action="{{ route('data-user.destroy', $dt['id']) }}"
+                                                                        method="POST" class="d-inline-block">
+                                                                        @csrf
+                                                                        @method('delete')
+                                                                        <div class="mb-0">
+                                                                            <input name="_method" type="hidden" value="DELETE">
+                                                                            <button type="submit"
+                                                                                class="btn btn-danger btndelete">
+                                                                                <i class="fa fa-trash"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
+                                                                @endcan
+                                                            </td>
                                                         </tr>
+                                                        @include('main-layouts.master-data.user-component._modal-hapus-user')
                                                     @endforeach
                                                 </tbody>
                                             </table>
@@ -95,6 +118,42 @@
     <script>
         $(document).ready(function() {
             $('#example').DataTable();
+        });
+    </script>
+    <script>
+        $('.btndelete').click(function(event) {
+            var form = $(this).closest("form");
+            var name = $(this).data("name");
+            event.preventDefault();
+            Swal.fire({
+                    title: 'Konfirmasi Hapus Data',
+                    text: 'Anda yakin ingin menghapus data ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!'
+                })
+                .then((willDelete) => {
+                    if (willDelete.isConfirmed) {
+                        form.submit();
+                    }
+                })
+        });
+
+
+        $(document).ready(function() {
+            // Periksa apakah ada pesan sukses dalam session flash
+            var alert = {!! json_encode(session('status')) !!};
+
+            // Jika ada pesan sukses, tampilkan SweetAlert
+            if (alert) {
+                Swal.fire({
+                    title: alert.title,
+                    text: alert.pesan,
+                    icon: alert.icon
+                });
+            }
         });
     </script>
 @endpush

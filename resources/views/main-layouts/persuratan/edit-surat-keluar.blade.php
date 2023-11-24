@@ -2,6 +2,9 @@
 
 
 @push('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/component.css') }}">
 @endpush
 
 @section('judul', 'Edit Surat Keluar')
@@ -15,11 +18,6 @@
                 <div class="card">
                     <div class="card-body p-2">
                         <div class="container mt-2">
-                            {{-- <a href="javascript:void(0);"
-                                onclick="window.open('{{ $pdfUrl }}', 'myWindow', 'width=600,height=800');">Tautan
-                                ke Example.com</a>
-
-                            <button class="btn" id="open-pdf-in-new-window">Open PDF in New Window</button> --}}
                             <div class="row">
                                 <div class="col-lg-12 mb-4">
                                     <a href="{{ route('surat-keluar') }}" class="btn btn-danger rounded-pill">
@@ -44,5 +42,20 @@
 @endsection
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.7.570/build/pdf.min.js"></script>
+    <script src="{{ asset('assets/js/custom-file-input.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            // Periksa apakah ada pesan sukses dalam session flash
+            var alert = {!! json_encode(session('status')) !!};
+
+            // Jika ada pesan sukses, tampilkan SweetAlert
+            if (alert) {
+                Swal.fire({
+                    title: alert.title,
+                    text: alert.pesan,
+                    icon: alert.icon
+                });
+            }
+        });
+    </script>
 @endpush

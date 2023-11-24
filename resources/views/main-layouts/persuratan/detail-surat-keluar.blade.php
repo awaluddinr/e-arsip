@@ -9,7 +9,16 @@
 
         .table-data td,
         .table-head th {
-            text-align: center
+            text-align: center;
+            font-size: 14px !important
+        }
+
+        .form-control {
+            font-size: 13px;
+        }
+
+        thead th {
+            font-size: 14px;
         }
     </style>
 @endpush
@@ -47,7 +56,8 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder=""
                                                     aria-label="Example text with button addon"
-                                                    aria-describedby="button-addon1" disabled value="soon">
+                                                    aria-describedby="button-addon1" disabled
+                                                    value="{{ $surat->no_agenda }}">
                                             </div>
                                         </td>
                                     </tr>
@@ -62,7 +72,8 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder=""
                                                     aria-label="Example text with button addon"
-                                                    aria-describedby="button-addon1" disabled value="soon">
+                                                    aria-describedby="button-addon1" disabled
+                                                    value="{{ $surat->tujuan_surat }}">
                                             </div>
                                         </td>
                                     </tr>
@@ -77,7 +88,8 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder=""
                                                     aria-label="Example text with button addon"
-                                                    aria-describedby="button-addon1" disabled value="soon">
+                                                    aria-describedby="button-addon1" disabled
+                                                    value="{{ \Carbon\Carbon::create($surat->tanggal_surat)->format('d F Y') }}">
                                             </div>
                                         </td>
                                     </tr>
@@ -94,7 +106,8 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder=""
                                                     aria-label="Example text with button addon"
-                                                    aria-describedby="button-addon1" disabled value="soon">
+                                                    aria-describedby="button-addon1" disabled
+                                                    value="{{ $surat->no_surat }}">
                                             </div>
                                         </td>
                                     </tr>
@@ -109,13 +122,14 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder=""
                                                     aria-label="Example text with button addon"
-                                                    aria-describedby="button-addon1" disabled value="soon">
+                                                    aria-describedby="button-addon1" disabled
+                                                    value="{{ $surat->klasifikasis->nama }}">
                                             </div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label for="nomor" class="my-auto px-5">Keterangan Surat</label>
+                                            <label for="nomor" class="my-auto px-5">Perihal Surat</label>
                                         </td>
                                         <td>
                                             <div class="input-group mb-2">
@@ -124,7 +138,8 @@
                                                 </div>
                                                 <input type="text" class="form-control" placeholder=""
                                                     aria-label="Example text with button addon"
-                                                    aria-describedby="button-addon1" disabled value="soon">
+                                                    aria-describedby="button-addon1" disabled
+                                                    value="{{ $surat->perihal_surat }}">
                                             </div>
                                         </td>
                                     </tr>
@@ -145,15 +160,28 @@
                                         <tbody>
                                             <tr class="table-data">
                                                 <td>1.</td>
-                                                <td>undangan.pdf</td>
+                                                <td>{{ $surat->file_surat }}</td>
                                                 <td>
-                                                    trisno23
+                                                    {{ $surat->user->name }}
                                                 </td>
-                                                <td>1.56 MB</td>
+                                                <td>{{ $hasil }}</td>
                                                 <td>
-                                                    <a href="" class="btn btn-success">
+                                                    <a href="javascript:void(0);"
+                                                        onclick="window.open('{{ route('surat-keluar.lihat', $surat->id) }}', 'myWindow', 'width=600,height=800');"
+                                                        class="btn btn-sm btn-info">
+                                                        <i class="fa fa-eye"></i>
+                                                    </a>
+                                                    <a href="{{ route('surat-keluar.download', $surat->id) }}"
+                                                        class="btn btn-sm btn-success">
                                                         <i class="fa fa-download"></i>
                                                     </a>
+                                                    <iframe {{ $class }} id="textfile"
+                                                        src="{{ route('surat-keluar.lihat', $surat->id) }}"
+                                                        frameborder="0">
+                                                    </iframe>
+                                                    <button class="btn btn-sm btn-warning" onclick="print()">
+                                                        <i class="fa fa-print"></i>
+                                                    </button>
                                                 </td>
                                             </tr>
 
@@ -167,10 +195,15 @@
 
             </div>
         </div>
-
     </section>
 @endsection
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.7.570/build/pdf.min.js"></script>
+    <script>
+        function print() {
+            var iframe = document.getElementById('textfile');
+            iframe.contentWindow.print();
+        }
+    </script>
 @endpush

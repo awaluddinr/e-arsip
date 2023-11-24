@@ -1,5 +1,11 @@
 @extends('layouts.dashboard-layout', ['title' => 'Dashboard'])
 
+@push('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/demo.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/component.css') }}">
+@endpush
+
 @section('judul', 'Tambah Surat Masuk')
 
 @section('main-content')
@@ -32,3 +38,22 @@
 
     </section>
 @endsection
+
+@push('js')
+    <script src="{{ asset('assets/js/custom-file-input.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            // Periksa apakah ada pesan sukses dalam session flash
+            var alert = {!! json_encode(session('status')) !!};
+
+            // Jika ada pesan sukses, tampilkan SweetAlert
+            if (alert) {
+                Swal.fire({
+                    title: alert.title,
+                    text: alert.pesan,
+                    icon: alert.icon
+                });
+            }
+        });
+    </script>
+@endpush

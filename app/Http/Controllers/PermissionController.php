@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InfoAkses;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
@@ -13,7 +14,8 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        return view('main-layouts.pengaturan.permission');
+        $permissions = InfoAkses::get();
+        return view('main-layouts.pengaturan.permission', compact('permissions'));
     }
 
     /**
